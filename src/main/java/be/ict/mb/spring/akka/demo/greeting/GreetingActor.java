@@ -1,4 +1,4 @@
-package be.ict.mb.spring.akka.demo;
+package be.ict.mb.spring.akka.demo.greeting;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;

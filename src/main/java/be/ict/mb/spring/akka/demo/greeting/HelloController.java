@@ -1,4 +1,4 @@
-package be.ict.mb.spring.akka.demo;
+package be.ict.mb.spring.akka.demo.greeting;
 
 import static akka.pattern.Patterns.ask;
 import static akka.util.Timeout.durationToTimeout;

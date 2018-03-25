@@ -1,0 +1,9 @@
+akka:
+  persistence:
+    journal:
+      plugin: "leveldb"
+
+      leveldb:
+        dir: "target/persistence/journal"
+
+    snapshot-store.local.dir: "target/persistence/snapshots"
