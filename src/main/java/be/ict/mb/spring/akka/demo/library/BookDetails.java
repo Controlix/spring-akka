@@ -1,10 +1,10 @@
 package be.ict.mb.spring.akka.demo.library;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
-public class CreateBookCommand {
-
+@Value
+public class BookDetails {
+	int id;
 	String title;
 	String author;
 }

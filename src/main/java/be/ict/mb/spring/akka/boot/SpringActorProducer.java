@@ -9,15 +9,17 @@ public class SpringActorProducer implements IndirectActorProducer {
 	 
     private ApplicationContext applicationContext;
     private String beanActorName;
+	private Object[] args;
  
-    public SpringActorProducer(ApplicationContext applicationContext, String beanActorName) {
+    public SpringActorProducer(ApplicationContext applicationContext, String beanActorName, Object ... args) {
         this.applicationContext = applicationContext;
         this.beanActorName = beanActorName;
+        this.args = args;
     }
  
     @Override
     public Actor produce() {
-        return (Actor) applicationContext.getBean(beanActorName);
+        return (Actor) applicationContext.getBean(beanActorName, args);
     }
  
     @Override
