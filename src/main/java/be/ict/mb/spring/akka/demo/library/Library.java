@@ -1,10 +1,10 @@
 package be.ict.mb.spring.akka.demo.library;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -22,8 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class Library extends AbstractActor {
 	
-	private Collection<ActorRef> books = new ArrayList<>();
-	private Map<Integer, BookDetails> bookDetails = Collections.synchronizedMap(new HashMap<>());
+	private Map<UUID, BookDetails> bookDetails = Collections.synchronizedMap(new HashMap<>());
 	
 	@Override
 	public void preStart() throws Exception {
@@ -46,7 +45,6 @@ public class Library extends AbstractActor {
 
 	private void add(AddBook addBook) {
 		log.info("Add book {}", addBook);
-		this.books.add(addBook.getBook());
 		addBook.getBook().tell(new GetBookDetails(), getSelf());
 	}
 	

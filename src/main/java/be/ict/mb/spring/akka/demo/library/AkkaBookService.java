@@ -1,10 +1,10 @@
 package be.ict.mb.spring.akka.demo.library;
 
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +30,8 @@ public class AkkaBookService implements BookService {
 	}
 
 	@Override
-	public int create(String title, String author) {
-		int id = RandomUtils.nextInt();
+	public UUID create(String title, String author) {
+		UUID id = UUID.randomUUID();
 		ActorRef book = actorSystem.actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(actorSystem).props("book", id, title, author), "book-" + id);
 		library.tell(new Library.AddBook(book), null);
 		return id;

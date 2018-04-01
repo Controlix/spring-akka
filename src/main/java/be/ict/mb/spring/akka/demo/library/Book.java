@@ -1,5 +1,7 @@
 package be.ict.mb.spring.akka.demo.library;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -15,11 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class Book extends AbstractActor {
 
-	int id;
+	UUID id;
 	String title;
 	String author;
 	
-	public Book(int id, String title, String author) {
+	public Book(UUID id, String title, String author) {
 		this.id = id;
 		this.title = title;
 		this.author = author;
