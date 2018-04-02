@@ -45,6 +45,11 @@
 			<version>${akka.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.typesafe.akka</groupId>
+			<artifactId>akka-persistence-query_2.12</artifactId>
+			<version>${akka.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.iq80.leveldb</groupId>
 			<artifactId>leveldb</artifactId>
 			<version>0.10</version>

@@ -13,6 +13,7 @@ import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import be.ict.mb.spring.akka.boot.SpringExtension;
+import be.ict.mb.spring.akka.demo.library.Book.InitializeBook;
 import be.ict.mb.spring.akka.demo.library.Library.AllBooks;
 import scala.compat.java8.FutureConverters;
 import scala.concurrent.duration.FiniteDuration;
@@ -32,7 +33,8 @@ public class AkkaBookService implements BookService {
 	@Override
 	public UUID create(String title, String author) {
 		UUID id = UUID.randomUUID();
-		ActorRef book = actorSystem.actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(actorSystem).props("book", id, title, author), "book-" + id);
+		ActorRef book = actorSystem.actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(actorSystem).props("book", id), "book-" + id);
+		book.tell(new InitializeBook(id, title, author), null);
 		library.tell(new Library.AddBook(book), null);
 		return id;
 	}
