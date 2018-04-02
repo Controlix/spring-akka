@@ -12,7 +12,9 @@ import akka.persistence.Recovery;
 import akka.persistence.SnapshotSelectionCriteria;
 import lombok.ToString;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ToString(exclude = {"unititialized", "initialized"})
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -39,6 +41,7 @@ public class Book extends AbstractPersistentActor {
 
 	@Override
 	public String persistenceId() {
+		log.info("Persistence id = {}", persistenceId);
 		return persistenceId;
 	}
 
@@ -63,6 +66,7 @@ public class Book extends AbstractPersistentActor {
 
 	private void initialize(BookCreated bookCreated) {
 //		this.persistenceId = bookCreated.getId().toString();
+		log.info("Initialize book with {}", bookCreated);
 		this.details = new BookDetails(bookCreated.getId(), bookCreated.getTitle(), bookCreated.getAuthor());
 		getContext().become(initialized);
 	}

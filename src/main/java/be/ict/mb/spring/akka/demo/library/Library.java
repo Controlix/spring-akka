@@ -15,6 +15,7 @@ import akka.actor.ActorRef;
 import akka.persistence.query.PersistenceQuery;
 import akka.persistence.query.journal.leveldb.javadsl.LeveldbReadJournal;
 import akka.stream.ActorMaterializer;
+import be.ict.mb.spring.akka.boot.SpringExtension;
 import be.ict.mb.spring.akka.demo.library.Book.GetBookDetails;
 import lombok.Singular;
 import lombok.Value;
@@ -32,7 +33,15 @@ public class Library extends AbstractActor {
 		log.info("Read all persistent ids");
 		LeveldbReadJournal queries = PersistenceQuery.get(getContext().getSystem()).getReadJournalFor(LeveldbReadJournal.class,
 				LeveldbReadJournal.Identifier());
-		queries.currentPersistenceIds().runForeach(System.out::println, ActorMaterializer.create(getContext().getSystem()));
+		queries.currentPersistenceIds().runForeach(id -> {
+			System.out.println(id);
+			try {
+				ActorRef book = getContext().actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(getContext().system()).props("book", UUID.fromString(id)), "book-" + id);
+				book.tell(new GetBookDetails(), getSelf());
+			} catch (IllegalArgumentException e) {
+				log.error("Not a valid UUID", e);
+			}
+		}, ActorMaterializer.create(getContext().system()));
 	}
 
 	@Override
