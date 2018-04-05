@@ -13,14 +13,16 @@ import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import be.ict.mb.spring.akka.boot.SpringExtension;
-import be.ict.mb.spring.akka.demo.library.Book.InitializeBook;
 import be.ict.mb.spring.akka.demo.library.Library.AllBooks;
+import be.ict.mb.spring.akka.demo.library.Library.BookId;
 import scala.compat.java8.FutureConverters;
 import scala.concurrent.duration.FiniteDuration;
 
 @Service
 public class AkkaBookService implements BookService {
-	
+
+	private static Timeout TIMEOUT = Timeout.durationToTimeout(FiniteDuration.create(1, TimeUnit.SECONDS));
+
 	private final ActorSystem actorSystem;
 	private final ActorRef library;
 	
@@ -31,19 +33,16 @@ public class AkkaBookService implements BookService {
 	}
 
 	@Override
-	public UUID create(String title, String author) {
-		UUID id = UUID.randomUUID();
-		ActorRef book = actorSystem.actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(actorSystem).props("book", id), "book-" + id);
-		book.tell(new InitializeBook(id, title, author), null);
-		library.tell(new Library.AddBook(book), null);
-		return id;
+	public CompletableFuture<UUID> create(String title, String author) {
+		return FutureConverters.toJava(Patterns.ask(library, new Library.AddBook(title, author), TIMEOUT)
+				.map(BookId.class::cast, actorSystem.dispatcher())
+				.map(BookId::getId, actorSystem.dispatcher()))
+				.toCompletableFuture();
 	}
 
 	@Override @Async
 	public CompletableFuture<Collection<BookDetails>> allBooks() {
-		FiniteDuration duration = FiniteDuration.create(1, TimeUnit.SECONDS);
-		Timeout timeout = Timeout.durationToTimeout(duration);
-		return FutureConverters.toJava(Patterns.ask(library, new Library.ListBooks(), timeout)
+		return FutureConverters.toJava(Patterns.ask(library, new Library.ListBooks(), TIMEOUT)
 				.map(AllBooks.class::cast, actorSystem.dispatcher())
 				.map(AllBooks::getBookDetails, actorSystem.dispatcher()))
 				.toCompletableFuture();

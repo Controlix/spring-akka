@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface BookService {
 
-	UUID create(String title, String author);
+	CompletableFuture<UUID> create(String title, String author);
 
 	CompletableFuture<Collection<BookDetails>> allBooks();
 

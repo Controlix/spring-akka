@@ -24,7 +24,7 @@ public class BookController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public UUID create(@RequestBody CreateBookCommand cmd) {
+	public CompletableFuture<UUID> create(@RequestBody CreateBookCommand cmd) {
 		return svc.create(cmd.title, cmd.author);
 	}
 	

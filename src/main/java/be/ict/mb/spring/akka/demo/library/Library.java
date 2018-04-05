@@ -17,6 +17,7 @@ import akka.persistence.query.journal.leveldb.javadsl.LeveldbReadJournal;
 import akka.stream.ActorMaterializer;
 import be.ict.mb.spring.akka.boot.SpringExtension;
 import be.ict.mb.spring.akka.demo.library.Book.GetBookDetails;
+import be.ict.mb.spring.akka.demo.library.Book.InitializeBook;
 import lombok.Singular;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -36,18 +37,18 @@ public class Library extends AbstractActor {
 		queries.currentPersistenceIds().runForeach(id -> {
 			System.out.println(id);
 			try {
-				ActorRef book = getContext().actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(getContext().system()).props("book", UUID.fromString(id)), "book-" + id);
-				book.tell(new GetBookDetails(), getSelf());
+				ActorRef book = getContext().actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(getContext().getSystem()).props("book", UUID.fromString(id)), "book-" + id);
+				book.tell(new GetBookDetails(), self());
 			} catch (IllegalArgumentException e) {
 				log.error("Not a valid UUID", e);
 			}
-		}, ActorMaterializer.create(getContext().system()));
+		}, ActorMaterializer.create(getContext().getSystem()));
 	}
 
 	@Override
 	public Receive createReceive() {
-		return receiveBuilder().match(AddBook.class, this::add)
-				.match(ListBooks.class, lb -> getSender().tell(new AllBooks(allBooks()), getSelf()))
+		return receiveBuilder().match(AddBook.class, ab -> sender().tell(new BookId(add(ab)), self()))
+				.match(ListBooks.class, lb -> getSender().tell(new AllBooks(allBooks()), self()))
 				.match(BookDetails.class, this::update).build();
 	}
 
@@ -56,9 +57,13 @@ public class Library extends AbstractActor {
 		return Collections.unmodifiableCollection(bookDetails.values());
 	}
 
-	private void add(AddBook addBook) {
+	private UUID add(AddBook addBook) {
 		log.info("Add book {}", addBook);
-		addBook.getBook().tell(new GetBookDetails(), getSelf());
+		UUID id = UUID.randomUUID();
+		ActorRef book = getContext().actorOf(SpringExtension.SPRING_EXTENSION_PROVIDER.get(getContext().getSystem()).props("book", id), "book-" + id);
+		book.tell(new InitializeBook(id, addBook.getTitle(), addBook.getAuthor()), null);
+		book.tell(new GetBookDetails(), self());
+		return id;
 	}
 
 	private void update(BookDetails bookDetails) {
@@ -68,7 +73,14 @@ public class Library extends AbstractActor {
 
 	@Value
 	public static class AddBook {
-		ActorRef book;
+		String title;
+		String author;
+	}
+
+
+	@Value
+	public static class BookId {
+		UUID id;
 	}
 
 	@Value

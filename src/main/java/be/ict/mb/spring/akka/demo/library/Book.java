@@ -36,7 +36,6 @@ public class Book extends AbstractPersistentActor {
 
 	public Book(UUID id) {
 		this.persistenceId = id.toString();
-		//getSelf().tell(new InitializeBook(id, title, author), getSelf());
 	}
 
 	@Override
@@ -49,8 +48,6 @@ public class Book extends AbstractPersistentActor {
 	public Receive createReceiveRecover() {
 		return receiveBuilder()
 				.match(BookCreated.class, this::initialize)
-//				.match(RecoveryCompleted.class,
-//						c -> getContext().actorSelection("/user/book-*").tell(details, getSelf()))
 				.build();
 	}
 
@@ -65,7 +62,6 @@ public class Book extends AbstractPersistentActor {
 	}
 
 	private void initialize(BookCreated bookCreated) {
-//		this.persistenceId = bookCreated.getId().toString();
 		log.info("Initialize book with {}", bookCreated);
 		this.details = new BookDetails(bookCreated.getId(), bookCreated.getTitle(), bookCreated.getAuthor());
 		getContext().become(initialized);
